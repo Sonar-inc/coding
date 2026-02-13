@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>產品比較 - 排序功能版</title>
+    <!-- 使用 Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 使用 React & ReactDOM CDN -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- 使用 Babel 轉換 JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- 使用 Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-slide-in {
+            animation: slideIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const initialProducts = [
+            {
+                id: 1,
+                title: 'R4-79 LED Direction Indicator Control Unit',
+                imageUrl: 'https://images.unsplash.com/photo-1558002038-1055907df827?auto=format&fit=crop&q=80&w=400',
+                specs: [
+                    { label: 'Voltage', value: '12V DC' },
+                    { label: 'Power Consumption', value: 'Aluminium' },
+                    { label: 'IP Rating', value: 'IP67' },
+                    { label: 'Red Wire', value: 'Led Lamp Positive' },
+                    { label: 'Black wire', value: 'Vehicle Negative' },
+                    { label: 'White wire', value: 'Flasher Unit' },
+                ],
+            },
+            {
+                id: 2,
+                title: 'C2-317 LED SEARCH LAMP REMOTE CONTROL',
+                imageUrl: 'https://images.unsplash.com/photo-1563991655280-cb95c90ca2fb?auto=format&fit=crop&q=80&w=400',
+                specs: [
+                    { label: 'Voltage', value: '12~24V DC' },
+                    { label: 'Body / Housing', value: 'Plastic' },
+                    { label: 'Power Consumption', value: '33W' },
+                    { label: 'LED Color Temperature', value: '5700K' },
+                    { label: 'Raw Lumen Output', value: '5700Lm' },
+                    { label: 'Effective Lumen Output', value: '2100Lm' },
+                ],
+            },
+            {
+                id: 3,
+                title: 'C2-391WU 173mm Floodlights - White/Blue (Plastic Bracket)',
+                imageUrl: 'https://images.unsplash.com/photo-1543196614-e046c7d3d82e?auto=format&fit=crop&q=80&w=400',
+                specs: [
+                    { label: 'Voltage', value: '9~33V DC' },
+                    { label: 'Body / Housing', value: 'Non metal thermally conductive polymer housing' },
+                    { label: 'Lens', value: 'PC' },
+                    { label: 'Power Consumption', value: '7W(white) / 4W(blue)' },
+                    { label: 'LED Color', value: '5700K(white) / 470nm' },
+                ],
+            },
+        ];
+
+        function App() {
+            const [products, setProducts] = useState(initialProducts);
+
+            const moveProduct = (index, direction) => {
+                const newProducts = [...products];
+                const targetIndex = direction === 'left' ? index - 1 : index + 1;
+
+                if (targetIndex >= 0 && targetIndex < newProducts.length) {
+                    const temp = newProducts[index];
+                    newProducts[index] = newProducts[targetIndex];
+                    newProducts[targetIndex] = temp;
+                    setProducts(newProducts);
+                }
+            };
+
+            const removeProduct = (id) => {
+                setProducts(products.filter(p => p.id !== id));
+            };
+
+            return (
+                <div className="min-h-screen p-4 md:p-10 font-sans">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {products.map((product, index) => (
+                                <div key={product.id} className="flex flex-col animate-slide-in">
+                                    
+                                    {/* 控制列 */}
+                                    <div className="flex items-center justify-between mb-4 px-2">
+                                        <button 
+                                            onClick={() => removeProduct(product.id)}
+                                            className="flex items-center text-sm text-gray-500 hover:text-red-500 transition-colors"
+                                        >
+                                            <i data-lucide="x" class="w-4 h-4 mr-1"></i>
+                                            Remove
+                                        </button>
+                                        
+                                        <div className="flex space-x-2">
+                                            <button 
+                                                onClick={() => moveProduct(index, 'left')}
+                                                disabled={index === 0}
+                                                className={`p-2 rounded-full border border-gray-300 transition-all ${
+                                                    index === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-gray-200'
+                                                }`}
+                                            >
+                                                <i data-lucide="chevron-left" class="w-5 h-5 text-gray-600"></i>
+                                            </button>
+                                            <button 
+                                                onClick={() => moveProduct(index, 'right')}
+                                                disabled={index === products.length - 1}
+                                                className={`p-2 rounded-full border border-gray-300 transition-all ${
+                                                    index === products.length - 1 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-gray-200'
+                                                }`}
+                                            >
+                                                <i data-lucide="chevron-right" class="w-5 h-5 text-gray-600"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* 產品圖片 */}
+                                    <div className="aspect-video bg-white rounded-lg flex items-center justify-center p-6 mb-6 shadow-sm">
+                                        <img 
+                                            src={product.imageUrl} 
+                                            alt={product.title}
+                                            className="max-h-full max-w-full object-contain mix-blend-multiply"
+                                            onerror="this.src='https://via.placeholder.com/300x200?text=Product+Image'"
+                                        />
+                                    </div>
+
+                                    {/* 產品標題 */}
+                                    <h3 className="text-lg font-bold text-gray-800 mb-8 leading-tight h-14 overflow-hidden">
+                                        {product.title}
+                                    </h3>
+
+                                    {/* 規格表格 */}
+                                    <div className="space-y-0">
+                                        {product.specs.map((spec, sIndex) => (
+                                            <div 
+                                                key={sIndex} 
+                                                className="flex justify-between py-3 border-t border-gray-200 last:border-b"
+                                            >
+                                                <span className="text-sm font-bold text-gray-700 w-1/2 pr-2">
+                                                    {spec.label}
+                                                </span>
+                                                <span className="text-sm text-gray-600 w-1/2 text-right">
+                                                    {spec.value}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {products.length === 0 && (
+                            <div className="text-center py-20">
+                                <p className="text-gray-500 italic">無比較產品。請重新整理頁面以還原。</p>
+                                <button 
+                                    onClick={() => setProducts(initialProducts)}
+                                    className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+                                >
+                                    還原產品
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        // 初始化圖示
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+        
+        // 每次渲染後執行 lucide.createIcons()
+        setTimeout(() => lucide.createIcons(), 100);
+    </script>
+</body>
+</html>
